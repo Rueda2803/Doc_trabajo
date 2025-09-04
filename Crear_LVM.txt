@@ -22,10 +22,10 @@ Dentro de fdisk:
 - vgs -> verificar volume group
 
 5. Crear el LV (Logical Volume) 
-- lvcreate -L (tamaño de disco GiB) -n nombre_lv nombre_vg
+- Opción 1: lvcreate -L (tamaño de disco GiB) -n nombre_lv nombre_vg 
+- Opción 2: lvcreate -l 100%FREE -n nombre_lv nombre_vg
 
 6. Formatear el LV
-
 - Para ext4: mkfs.ext4 /dev/nombre_vg/nombre_lv
 - Para xfs: mkfs.xfs /dev/nombre_vg/nombre_lv
 
