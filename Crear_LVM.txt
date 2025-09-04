@@ -1,0 +1,40 @@
+Crear disco como LVM Linux
+
+1. Identificar disco: lsblk
+2. Crear una partición tipo LVM Linux
+- fdisk /dev/sdb (o nombre de disco)
+Dentro de fdisk:
+> n → nueva partición
+> p → primaria
+> 1 → número de partición
+> Enter → inicio por defecto
+> Enter → final por defecto (usar todo el disco)
+> t → cambiar tipo
+> 8e → Linux LVM
+> w → guardar y salir
+
+3. Crear el PV (Physical Volume)
+- pvcreate /dev/sdb1
+- pvs -> Verificar physical volume
+
+4. Crear el VG (Volume Group)
+- vgcreate nombre_vg /dev/sdb1
+- vgs -> verificar volume group
+
+5. Crear el LV (Logical Volume) 
+- lvcreate -L (tamaño de disco GiB) -n nombre_lv nombre_vg
+
+6. Formatear el LV
+
+- Para ext4: mkfs.ext4 /dev/nombre_vg/nombre_lv
+- Para xfs: mkfs.xfs /dev/nombre_vg/nombre_lv
+
+7. Montar filesystem
+- mkdir /datos
+- mount /dev/nombre_vg/nombre_lv /datos
+
+8. Montar automatico el arranque 
+- Agregar en /etc/fstab: /dev/nombre_vg/nombre_lv   /datos   xfs   defaults   0 0
+
+
+
