@@ -1,0 +1,44 @@
+-------------------------------------------------------------------------------
+   Añadir un disco en un Guest del Exadata para ampliar un filesystem
+-------------------------------------------------------------------------------
+NOTA: TODO EL PROCEDIMIENTO SE PUEDE REALIZAR EN LINEA
+
+1. Verificar espacio en carpeta /EXAVMIMAGES
+# df -h /EXAVMIMAGES
+
+2. Verificar que el nombre que se va a utilizar no este siendo utilizado 
+# ls -l /EXAVMIMAGES/GuestImages/DomainName/new_disk_image_name
+
+3. Crear disco en la VM
+# vm_maker --create --disk-image /EXAVMIMAGES/GuestImages/prodvm.domain.com/pv3_vgexadb.img --size 100G --attach --domain prodvm.domain.com
+
+4. Verificar que el disco se haya creado en el dominio
+# vm_maker --list --disk-image --domain prodvm.domain.com
+
+5. Ingrese a la VM y verifique el nuevo disco creado
+# lvdisplay /dev/VGExaDbDisk.pv3_vgexadb.img/LVDBDisk 
+
+6. Se debe remover el logical volume y el volume group, con la finalidad de tener unicamente el physical volume 
+# lvremove /dev/VGExaDbDisk.pv3_vgexadb.img/LVDBDisk
+# vgremove VGExaDbDisk.pv3_vgexadb.img
+
+7. Se identifica que el disco se pueda utilizar 
+# pvdisplay 
+. . .
+  "/dev/sdf1" is a new physical volume of "100.00 GiB" <== here
+  --- NEW Physical volume ---
+  PV Name               /dev/sdf1
+  VG Name
+  PV Size               100.00 GiB
+  . . .
+
+8.  Se verifica el VG que se va a extender y luego se procede a extenderlo con el nuevo disco
+# vgdisplay VGExaDb -s
+# vgextend VGExaDb /dev/sdf1
+
+9. Se extiende el logical volume que desamos extender y hacer un resize del mismo 
+# lvextend -L +100G /dev/VGExaDb/LVDbOra1
+# xfs_growfs /u01
+
+
+Referencia: https://docs.oracle.com/en/engineered-systems/exadata-database-machine/dbmmn/adding-new-lvm-disk-user-domain-kvm.html
