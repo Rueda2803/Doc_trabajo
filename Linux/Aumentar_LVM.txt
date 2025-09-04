@@ -1,0 +1,35 @@
+-----------------------------------------------------------------
+          Aumento de LVM con un nuevo disco
+-----------------------------------------------------------------
+
+Crear disco como LVM Linux
+
+1. Identificar disco: lsblk
+2. Crear una partición tipo LVM Linux
+- fdisk /dev/sdb (o nombre de disco)
+Dentro de fdisk:
+> n → nueva partición
+> p → primaria
+> 1 → número de partición
+> Enter → inicio por defecto
+> Enter → final por defecto (usar todo el disco)
+> t → cambiar tipo
+> 8e → Linux LVM
+> w → guardar y salir
+
+2. Crear el physical volume
+# pvcreate /dev/disco
+
+3. Identificar volume group a aumentar y extenderlo
+# vgs 
+# vgextend VolGroup /dev/disco
+
+4. Identificar LV a aumentar y extenderlo
+# lvs
+# lvextend -L 100G /dev/VolGroup/lv_root o puede ser lvextend -l +100%FREE /dev/VolGroup/lv_root
+
+5. Extender el filesystem 
+# xfs_growfs / si es ext4 se usa resize2fs / 
+
+6. Verificar aumento
+# df -Th 
