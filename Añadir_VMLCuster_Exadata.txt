@@ -1,0 +1,20 @@
+---------------------------------------------------------------------
+         Añadir VMCluster en Exadata 
+---------------------------------------------------------------------
+
+1. Utilizar el ultimo OEDA del equipo 
+2. Aperturar herramienta OEDA e importar template 
+3. Realizar modificaciones en el template 
+4. Descargar ZIP e identificar archivo XML de nuevo cluster 
+5. Colocar los instaladores en la carpeta WorkDir (en dado caso no tenga los instaladores al momento de desplegar el ./install.sh este dira que paquetes faltan)
+6. Se debe utilizar la herramienta de despliegue install.sh 
+7. Para verificar los pasos se utiliza el comando: ./install.sh -cf nombre_cluster_nuevo.xml -l
+NOTA: Si el Exadata esta productivo no debe correr los siguientes pasos:
+▲ Update Nodes for Eighth Rack (For Eighth Rack systems only)
+▲ Calibrate Cells
+▲ Create Cell Disks
+▲ Resecure Machine
+---Cuando se realice el paso de Create Installation Summary aseguse de que utilice la opción -nocalibratecell
+8. Para realizar el despligue por pasos se puede realizar de la siguiente manera:
+- Opción 1 (individual): ./install.sh -cf cluster4.xml -s 1
+- Opción 2 (rango): ./install.sh -cf cluster4.xml -r 12-16
