@@ -29,12 +29,14 @@ Dentro de fdisk:
 - Para ext4: mkfs.ext4 /dev/nombre_vg/nombre_lv
 - Para xfs: mkfs.xfs /dev/nombre_vg/nombre_lv
 
-7. Montar filesystem
+7. Crear filesystem
 - mkdir /datos
-- mount /dev/nombre_vg/nombre_lv /datos
 
 8. Montar automatico el arranque 
 - Agregar en /etc/fstab: /dev/nombre_vg/nombre_lv   /datos   xfs   defaults   0 0
+
+9. Montar filesystem
+- mount /datos
 
 
 
