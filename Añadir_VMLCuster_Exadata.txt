@@ -18,3 +18,6 @@ NOTA: Si el Exadata esta productivo no debe correr los siguientes pasos:
 8. Para realizar el despligue por pasos se puede realizar de la siguiente manera:
 - Opción 1 (individual): ./install.sh -cf cluster4.xml -s 1
 - Opción 2 (rango): ./install.sh -cf cluster4.xml -r 12-16
+
+
+Referencia: https://docs.oracle.com/en/engineered-systems/exadata-database-machine/dbmin/adding-cluster-existing-system.html#DBMIN-GUID-EE18683C-7311-4A13-8BD9-6F0141E4A0F6
