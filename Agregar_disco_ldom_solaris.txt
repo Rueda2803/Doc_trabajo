@@ -15,5 +15,8 @@
 4. Se presenta el disco al dominio o al ldom con un nombre representativo
 - ldm add-vdisk nombre_disco nombre_disco@primary-vds0 ldom_nombre
 
-5. Verificación de logs en el ldom 
+5. Verificar a nivel de ldom
+- ldm ls -o disk ldom_name | egrep "disco"
+
+6. Verificación de logs en el ldom 
 - cat /var/messages 
