@@ -1,0 +1,19 @@
+---------------------------------------------------------------
+      Agregar disco a ldom solaris
+---------------------------------------------------------------
+
+1. Identificación de los discos a añadir
+- fdisk
+
+2. Format de discos a añadir
+- format
+- seleccionar numero de disco
+
+3. Se presenta el disco físico al servidor de disco virtual el cual exportará como disco virtual al dominio 
+- ldm add-vdsdev /dev/dsk/disco_s6 nombre_disco@primary-vds0
+
+4. Se presenta el disco al dominio o al ldom con un nombre representativo
+- ldm add-vdisk nombre_disco nombre_disco@primary-vds0 ldom_nombre
+
+5. Verificación de logs en el ldom 
+- cat /var/messages 
