@@ -1,0 +1,193 @@
+-------------------------------------------------------------------------------
+   Configuración de Quorum Disks para alta redundancia en un Exadata
+-------------------------------------------------------------------------------
+Referencia: https://docs.oracle.com/en/engineered-systems/exadata-database-machine/dbmmn/configure-quorum-disks-high-redundancy-disk-group.html
+
+PARTE I: Equipo de BD
+
+1. Conéctese a su instancia de Oracle ASM como administrador de ASM y ejecute la siguiente consulta para identificar grupos de discos de alta redundancia que tengan menos de cinco grupos de fallos y carezcan de los discos de quórum requeridos.
+
+SQL> SELECT dg.name DISK_GROUP_NAME, dg.state, dg.type REDUNDANCY, COUNT(distinct d.failgroup) FAILURE_GROUPS
+     FROM v$asm_diskgroup dg JOIN v$asm_disk d USING (group_number)
+     WHERE dg.type = 'HIGH' AND group_number NOT IN
+         ( SELECT group_number
+           FROM v$asm_disk
+           WHERE failgroup_type = 'QUORUM'
+           HAVING COUNT(group_number) < 2
+           GROUP BY group_number )
+     HAVING count(distinct d.failgroup) < 5
+     GROUP BY dg.name, dg.state, dg.type;
+
+DISK_GROUP_NAME                STATE       REDUNDANCY FAILURE_GROUPS
+------------------------------ ----------- ---------- --------------
+SPAR1                          MOUNTED     HIGH                    3
+
+2. Valide el estado de cualquier disco de quórum existente.
+
+SQL> set lines 160
+SQL> set pages 100
+SQL> SELECT dg.name disk_group, d.name, d.mode_status, d.state, d.header_status
+     FROM v$asm_diskgroup dg JOIN v$asm_disk d USING (group_number) 
+     WHERE d.failgroup_type = 'QUORUM' ;
+
+DISK_GROUP                     NAME                           MODE_STATUS STATE    HEADER_STATUS
+------------------------------ ------------------------------ ----------- -------- ------------
+DATA1                          QD_DATA1_DBNODE01              ONLINE      NORMAL   MEMBER
+DATA1                          QD_DATA1_DBNODE02              ONLINE      NORMAL   MEMBER
+RECO1                          QD_RECO1_DBNODE01              ONLINE      NORMAL   MEMBER
+RECO1                          QD_RECO1_DBNODE02              ONLINE      NORMAL   MEMBER
+
+Para los discos de quórum existentes, verifique que MODE_STATUS=ONLINE, STATE=NORMAL y que cada disco de quórum sea miembro del grupo de discos correspondiente.
+
+PARTE II: Equipo de infraestructura
+
+1.Verifique y, si es necesario, cree las configuraciones del disco de quórum en todos los nodos de base de datos.
+Como usuario root del sistema operativo, ejecute `/opt/oracle.SupportTools/quorumdiskmgr --list --config` en cada nodo de base de datos. Por ejemplo:
+
+[root@dbnode01 ~]# /opt/oracle.SupportTools/quorumdiskmgr --list --config
+Owner: grid
+Group: asmadmin
+ifaces: exadata_re0 exadata_re1
+Initiatior name: iqn.1988-12.com.example:192.168.8.53
+
+[root@dbnode02 ~]# /opt/oracle.SupportTools/quorumdiskmgr --list --config
+Owner: grid
+Group: asmadmin
+ifaces: exadata_re0 exadata_re1
+Initiatior name: iqn.1988-12.com.example:192.168.8.55
+
+La configuración del disco de quórum debe existir en todos los nodos del clúster. Si falta en algún nodo, utilice `quorumdiskmgr` para crear y confirmar la configuración requerida. Por ejemplo:
+
+[root@dbnode02 ~]# /opt/oracle.SupportTools/quorumdiskmgr --create --config --owner=grid --group=asmadmin --network-iface-list="re0, re1"
+[INFO     ] [Info] Successfully created iface exadata_re0 with iface.net_ifacename re0
+[INFO     ] [Info] Successfully created iface exadata_re1 with iface.net_ifacename re1
+[INFO     ] [Success] created quorumdisk configurations
+
+[root@dbnode02 ~]# /opt/oracle.SupportTools/quorumdiskmgr --list --config
+Owner: grid
+Group: asmadmin
+ifaces: exadata_re0 exadata_re1
+Initiatior name: iqn.1988-12.com.example:192.168.8.55
+
+2. Obtenga los nombres de las interfaces de interconexión del clúster y las direcciones IP de cada nodo de base de datos.
+
+a) Para determinar los nombres de las interfaces de interconexión del clúster, ejecute la utilidad oifcfg desde el directorio raíz (home) de Oracle Grid Infrastructure (GI) como usuario root del sistema operativo.
+[root@dbnode01 ~]# /u01/app/19.22.0.0/grid/bin/oifcfg getif
+bondeth0  10.128.0.0  global  public
+re0  192.168.8.0  global  cluster_interconnect,asm
+re1  192.168.8.0  global  cluster_interconnect,asm
+
+b) En cada nodo de base de datos, utilice los nombres de las interfaces de interconexión del clúster para obtener las direcciones IP asociadas.
+Por ejemplo:
+
+[root@dbnode01 ~]# ip addr show re0 | grep inet
+    inet 192.168.8.53/24 brd 192.168.8.255 scope global noprefixroute re0
+[root@dbnode01 ~]# ip addr show re1 | grep inet
+    inet 192.168.8.54/24 brd 192.168.8.255 scope global noprefixroute re1
+
+[root@dbnode02 ~]# ip addr show re0 | grep inet
+    inet 192.168.8.55/24 brd 192.168.8.255 scope global noprefixroute re0
+[root@dbnode02 ~]# ip addr show re1 | grep inet
+    inet 192.168.8.56/24 brd 192.168.8.255 scope global noprefixroute re1
+
+En la salida de ejemplo, las direcciones IP son:
+
+En dbnode01: 192.168.8.53, 192.168.8.54.
+
+En dbnode02: 192.168.8.55, 192.168.8.56.
+
+3. Cree destinos de disco de quórum para el grupo de discos en todos los nodos de base de datos.
+
+En cada nodo del clúster, como usuario root del sistema operativo, ejecute: # /opt/oracle.SupportTools/quorumdiskmgr --create --target --asm-disk-group=<DISKGROUP_NAME> --visible-to="<IP1>,<IP2>,<IP3>,<IP4>"
+
+Por ejemplo: 
+[root@dbnode01 ~]# /opt/oracle.SupportTools/quorumdiskmgr --create --target --asm-disk-group=SPAR1 --visible-to="192.168.8.53,192.168.8.54,192.168.8.55,192.168.8.56"
+
+[INFO     ] [Success] Created logical volume /dev/VGExaDb/LVDbVdDBNODE01SPAR1.
+[INFO     ] [Success] Created backstore QD_SPAR1_DBNODE01.
+[INFO     ] [Success] Created target iqn.2015-05.com.example:qd--spar1--dbnode01.
+
+[root@dbnode02 ~]# /opt/oracle.SupportTools/quorumdiskmgr --create --target --asm-disk-group=SPAR1 --visible-to="192.168.8.53,192.168.8.54,192.168.8.55,192.168.8.56"
+
+[INFO     ] [Success] Created logical volume /dev/VGExaDb/LVDbVdDBNODE02SPAR1.
+[INFO     ] [Success] Created backstore QD_SPAR1_DBNODE02.
+[INFO     ] [Success] Created target iqn.2015-05.com.example:qd--spar1--dbnode02.
+
+Verifique los objetivos recién creados ejecutando:
+
+# /opt/oracle.SupportTools/quorumdiskmgr --list --target
+
+Por ejemplo:
+
+[root@dbnode01 ~]# /opt/oracle.SupportTools/quorumdiskmgr --list --target
+
+...
+
+Name: iqn.2015-05.com.example:qd--spar1--dbnode01
+Host name: dbnode01
+ASM disk group name: SPAR1
+Visible to: iqn.1988-12.com.example:192.168.8.53, iqn.1988-12.com.example:192.168.8.54, iqn.1988-12.com.example:192.168.8.55, iqn.1988-12.com.example:192.168.8.56
+Discovered by: 192.168.8.53, 192.168.8.55, 192.168.8.56
+
+[root@dbnode02 ~]# /opt/oracle.SupportTools/quorumdiskmgr --list --target
+
+...
+
+Name: iqn.2015-05.com.example:qd--spar1--dbnode02
+Host name: dbnode02
+ASM disk group name: SPAR1
+Visible to: iqn.1988-12.com.example:192.168.8.53, iqn.1988-12.com.example:192.168.8.54, iqn.1988-12.com.example:192.168.8.55, iqn.1988-12.com.example:192.168.8.56
+Discovered by: 192.168.8.53, 192.168.8.55
+
+4.Cree los dispositivos de disco de quórum en todos los nodos de base de datos.
+
+En cada nodo del clúster, como usuario root del sistema operativo, ejecute: /opt/oracle.SupportTools/quorumdiskmgr --create --device --target-ip-list="<IP1>,<IP2>,<IP3>,<IP4>"
+
+Por ejemplo:
+
+[root@dbnode01 ~]# /opt/oracle.SupportTools/quorumdiskmgr --create --device --target-ip-list="192.168.8.53,192.168.8.54,192.168.8.55,192.168.8.56"
+
+[INFO     ] [Success] created all device(s) from target(s) on machine with IP address 192.168.8.54
+[INFO     ] [Success] created all device(s) from target(s) on machine with IP address 192.168.8.55
+[INFO     ] [Success] created all device(s) from target(s) on machine with IP address 192.168.8.56
+
+[root@dbnode02 ~]# /opt/oracle.SupportTools/quorumdiskmgr --create --device --target-ip-list="192.168.8.53,192.168.8.54,192.168.8.55,192.168.8.56"
+
+[INFO     ] [Success] created all device(s) from target(s) on machine with IP address 192.168.8.53
+[INFO     ] [Success] created all device(s) from target(s) on machine with IP address 192.168.8.54
+[INFO     ] [Success] created all device(s) from target(s) on machine with IP address 192.168.8.56
+
+Verifique los dispositivos recién creados ejecutando:
+
+[root@dbnode01 ~]#  /opt/oracle.SupportTools/quorumdiskmgr --list --device
+
+...
+
+Device path: /dev/exadata_quorum/QD_SPAR1_DBNODE01
+Host name: dbnode01
+ASM disk group name: SPAR1
+Size: 128 MB
+
+Device path: /dev/exadata_quorum/QD_SPAR1_DBNODE02
+Host name: dbnode02
+ASM disk group name: SPAR1
+Size: 128 MB
+
+[root@dbnode02 ~]#  /opt/oracle.SupportTools/quorumdiskmgr --list --device
+
+...
+
+Device path: /dev/exadata_quorum/QD_SPAR1_DBNODE01
+Host name: dbnode01
+ASM disk group name: SPAR1
+Size: 128 MB
+
+Device path: /dev/exadata_quorum/QD_SPAR1_DBNODE02
+Host name: dbnode02
+ASM disk group name: SPAR1
+Size: 128 MB
+
+PARTE III: Equipo de base de datos
+
+1. Confirme que los nuevos dispositivos de disco de quórum sean visibles como discos CANDIDATOS en Oracle ASM. Para esto se puede dar el link proporcionado en la referencia 
+y que realicen el paso 5 en adelante.

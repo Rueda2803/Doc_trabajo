@@ -1,0 +1,57 @@
+-------------------------------------------------------------------------------
+   Añadir un diskgroup en un VM Cluster de Exadata 
+-------------------------------------------------------------------------------
+Referencia: https://docs.oracle.com/en/engineered-systems/exadata-database-machine/dbmin/add-diskgroup.html
+
+1. Descargar la versión más reciente de OEDACLI para linux: https://www.oracle.com/database/technologies/oeda-downloads.html 
+2. Realice un descubrimiento de la infraestructura con oedacli: 
+
+#DISCOVER ES HOSTNAMES = 'dom0,dom1,cel1,cel2,cel3' LOCATION = /EXAVMIMAGES/onecommand/dir_oeda/linux-x64/ExadataConfigurations
+
+NOTA: el usuario root debe tener la misma contraseña en toda la infraestructura del Exadata por ejemplo welcome1
+
+
+3. 
+oedacli> add diskgroup diskgroupname=OTHER7 diskgroupsize=1TB  redundancy=HIGH celllist='dbm01celadm07.example.com,dbm01celadm08.example.com,dbm01celadm09.example.com'  where clustername=Cluster-c1
+oedacli> save action
+oedacli> merge actions
+ processMerge
+ processMergeActions
+ Merging Action : add diskgroup diskgroupname=OTHER7 diskgroupsize=1TB  redundancy=HIGH celllist='dbm01celadm07.example.com,dbm01celadm08.example.com,dbm01celadm09.example.com'  where clustername=Cluster-c1
+ Merging ADD DISKGROUP
+ Action Validated and Merged OK
+oedacli> deploy actions
+ Deploying Action ID : 3 add diskgroup diskgroupname=OTHER7 diskgroupsize=1TB  redundancy=HIGH celllist='dbm01celadm07.example.com,dbm01celadm08.example.com,dbm01celadm09.example.com'  where clustername=Cluster-c1
+ Deploying ADD DISKGROUP
+ Diskgroup OTHER7 will be created on Storage Servers  [dbm01celadm07.example.com, dbm01celadm08.example.com, dbm01celadm09.example.com]
+ Validating free space....
+ Creating Grid Disks for ASM Disk Group OTHER7
+ Creating ASM Disk Group OTHER7
+ Updating ASM Diskstring...
+ Checking ASM Disk Group status...
+Completed creation of ASM Disk Group OTHER7
+Done...
+Done
+
+NOTA: Se puede usar el clustername , clusternumber y cluster ID:
+
+ADD DISKGROUP 
+   [ ACFSNAME=acfs_name ]
+   [ ACFSPATH=acfs_path ]
+   [ ACFSSIZE=acfs_size ]
+   [ CELLLIST='cell_list' ]
+   DISKGROUPNAME=diskgroup_name 
+   [ DISKGROUPLOCATION=diskgroup_location ] 
+   DISKGROUPSIZE=diskgroup_size
+   [ OCRVOTE=ocr_voting_disks_included ] 
+   [ QUORUMDISK=quorum_disks_included ]
+   REDUNDANCY=redundancy_level
+   SLICESIZE=slice_size 
+   [ SPARSE=sparse ]
+   [ TYPE=diskgroup_type [ DATABASENAME=database_name ]]
+WHERE
+   { CLUSTERNUMBER=cluster_number |
+     CLUSTERNAME=cluster_name |
+     CLUSTERID=cluster_id }
+
+Sino se sabe cual es el clustername o number utilice el comando LIST DISKGROUPS: https://docs.oracle.com/en/engineered-systems/exadata-database-machine/dbmin/list-diskgroups.html

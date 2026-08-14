@@ -1,0 +1,146 @@
+-------------------------------------------------------------------------------
+   Upgrade de Cluster en un Exadata
+-------------------------------------------------------------------------------
+Referencia: https://docs.oracle.com/en/engineered-systems/exadata-database-machine/dbmin/upgrade-cluster.html
+
+NOTA: Descargar la versión más reciente de OEDACLI para linux: https://www.oracle.com/database/technologies/oeda-downloads.html
+
+Utilice este comando para actualizar un clúster de Oracle Grid Infrastructure, ya sea dentro de la misma versión principal o entre versiones principales distintas.
+
+Syntax:
+UPGRADE CLUSTER
+   GIVERSION=Grid_relnum
+   GIHOMELOC=Grid_home_dir
+WHERE 
+   { CLUSTERNAME=cluster_name [ STEPNAME=step_name ] | 
+     CLUSTERNUMBER=cluster_number [ STEPNAME=step_name ] | 
+     ID=cluster_id [ STEPNAME=step_name ] }
+
+Argumentos
+
+GIVERSION: La versión del software Oracle Grid Infrastructure a la que se está actualizando, incluida la actualización de lanzamiento (RU). Por ejemplo, 19.26.0.0.250121.
+
+GIHOMELOC: La ubicación de destino del directorio raíz (home) de Oracle Grid Infrastructure.
+
+Los siguientes argumentos están disponibles en la cláusula WHERE:
+
+CLUSTERNUMBER: Especifica el número del clúster en el archivo es.xml, comenzando por 1.
+
+CLUSTERNAME: Especifica el nombre del clúster.
+
+ID: Especifica el ID del clúster en el archivo es.xml.
+
+STEPNAME: Especifica, opcionalmente, el paso individual de la actualización:
+
+1. ADD_HOME
+2. CONFIG_HOME
+3. RUN_ROOTSCRIPT
+4. DELETE_OLDHOME
+
+Usage Notes:
+
+>El comando permite actualizar un clúster a una versión posterior dentro de la misma versión principal o a una versión principal más reciente; por ejemplo, actualizar de Oracle Grid Infrastructure versión 19c a la versión 26ai.
+
+>Este comando solo permite actualizar un clúster en una implementación de máquina virtual (VM); no se puede utilizar para actualizar un clúster en una implementación física (*bare-metal*).
+
+>Si no se especifica el parámetro STEPNAME, se ejecutan los pasos ADD_HOME y CONFIG_HOME.
+
+>El paso RUN_ROOTSCRIPT ejecuta el script rootupgrade.sh de forma secuencial y escalonada (*rolling mode*) en todos los nodos. Este paso también reinicia las instancias de base de datos en cada uno de los nodos.
+
+>Una vez ejecutado el paso DELETE_OLDHOME junto con el comando UPGRADE CLUSTER, no es posible utilizar posteriormente el comando DOWNGRADE CLUSTER para revertir la actualización.
+
+Ejemplo: 
+
+Este ejemplo muestra los tres primeros pasos (ADD_HOME, CONFIG_HOME y RUN_ROOTSCRIPT) de una actualización del clúster paso a paso. Al finalizar este ejemplo, el clúster está actualizado, pero todavía es posible revertir la actualización (realizar un *downgrade*) porque no se ha ejecutado el paso DELETE_OLDHOME.
+
+oedacli> upgrade cluster giversion=18.13.0.0.210119 gihomeloc=/u01/app/18.13.0.0/grid where clusternumber=1 stepname=add_home
+oedacli> save action
+oedacli> merge actions
+ processMerge
+ processMergeActions
+ Merging Action : upgrade cluster giversion=18.13.0.0.210119 gihomeloc=/u01/app/18.13.0.0/grid where clusternumber=1 stepname=add_home
+ Merging UPGRADE CLUSTER
+ Action Validated and Merged OK
+oedacli> deploy actions
+ Deploying Action ID : 1 upgrade cluster giversion=18.13.0.0.210119 gihomeloc=/u01/app/18.13.0.0/grid where clusternumber=1 stepname=add_home
+ Deploying UPGRADE CLUSTER
+ Upgrading Cluster
+ Performing Upgrade Validations...
+ Validating target Clusterware version 18.13.0.0...
+ Validating source Clusterware version 12.2.0.1.190115...
+ Checking Cluster status...
+ Checking status of cluster...
+ Active cluster version on cluster ovmClus8 is 12.2.0.1.0
+ Validating Target Clusterware Home.. /u01/app/18.13.0.0/grid
+ Checking to see if /u01/app/18.13.0.0/grid is already mounted
+ SUCCESS: 18.13.0.0 is supported version for upgrade.
+ SUCCESS: Current Cluster Version 12.2.0.1.190115 is supported for Upgrade using this Utility.
+ SUCCESS: 
+ SUCCESS: Required Image Version 21.2.0.0.0 for Oracle18c found on dbm01adm01vm08
+ SUCCESS: Required Image Version 21.2.0.0.0 for Oracle18c found on dbm01adm02vm08
+ SUCCESS: Cluster verification completed successfully
+ SUCCESS: Find the valid upgrading version from 12.2.0.1 to 18.13.0.0
+ SUCCESS: Target Cluster Version is valid..
+ SUCCESS: Target Clusterware Home /u01/app/18.13.0.0/grid is not already mounted.
+ SUCCESS: Found valid target clusterware version.
+ SUCCESS: Valid Bundle Patch / RU Version found.
+ Validating required files...
+ Extracting files..
+ Copying files...
+ Creating new disk image file..
+ Attaching disk image to Virtual Machine dbm01adm01vm08.example.com
+ Attaching disk image to Virtual Machine dbm01adm02vm08.example.com
+ Completed adding new Clusterware home /u01/app/18.13.0.0/grid on  Cluster  ovmClus8
+ Done...
+ Done
+
+oedacli> upgrade cluster giversion=18.13.0.0.210119 gihomeloc=/u01/app/18.13.0.0/grid where clusternumber=1 stepname=config_home
+oedacli> save action
+oedacli> merge actions
+ processMerge
+ processMergeActions
+ Merging Action : upgrade cluster giversion=18.13.0.0.210119 gihomeloc=/u01/app/18.13.0.0/grid where clusternumber=1 stepname=config_home
+ Merging UPGRADE CLUSTER
+ Action Validated and Merged OK
+oedacli> deploy actions
+ Deploying Action ID : 2 upgrade cluster giversion=18.13.0.0.210119 gihomeloc=/u01/app/18.13.0.0/grid where clusternumber=1 stepname=config_home
+ Deploying UPGRADE CLUSTER
+ Upgrading Cluster
+ Configuring new clusterware home at /u01/app/18.13.0.0/grid
+ Running Cluster Verification Utility for upgrade readiness..
+ Pre-upgrade Validation completed successfully.
+ Setting up new clusterware home...
+ Relinking binaries with RDS /u01/app/18.13.0.0/grid
+ Upgrading software..
+ Completed configuring new Clusterware home /u01/app/18.13.0.0/grid
+ Done...
+ Done
+
+oedacli> upgrade cluster giversion=18.13.0.0.210119 gihomeloc=/u01/app/18.13.0.0/grid where clusternumber=1 stepname=RUN_ROOTSCRIPT
+oedacli> save action
+oedacli> merge actions
+ processMerge
+ processMergeActions
+ Merging Action : upgrade cluster giversion=18.13.0.0.210119 gihomeloc=/u01/app/18.13.0.0/grid where clusternumber=1 stepname=RUN_ROOTSCRIPT
+ Merging UPGRADE CLUSTER
+ Action Validated and Merged OK
+oedacli> deploy actions
+ Deploying Action ID : 3 upgrade cluster giversion=18.13.0.0.210119 gihomeloc=/u01/app/18.13.0.0/grid where clusternumber=1 stepname=RUN_ROOTSCRIPT
+ Deploying UPGRADE CLUSTER
+ Upgrading Cluster
+ Running Cluster Verification Utility for upgrade readiness..
+ Pre-upgrade Validation completed successfully.
+ Running rootupgrade.sh on node dbm01adm01vm08.example.com
+ Checking file root_dbm01adm01vm08.example.com_2021-05-07_16-35-47-279774287.log on node dbm01adm01vm08.example.com
+ Checking status of cluster on dbm01adm01vm08.example.com
+ Running rootupgrade.sh on node dbm01adm02vm08.example.com
+ Checking file root_dbm01adm02vm08.example.com_2021-05-07_16-55-09-777507261.log on node dbm01adm02vm08.example.com
+ Checking status of cluster on dbm01adm02vm08.example.com
+ Running Configuration Assistants on dbm01adm01vm08.example.com
+ Active cluster version after upgrade 18.0.0.0.0
+ Clusterware successfully upgraded to 18.13.0.0.210119
+ Applying Security Fixes...
+ Done...
+ Done
+
+ 

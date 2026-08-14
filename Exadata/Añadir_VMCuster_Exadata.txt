@@ -21,3 +21,6 @@ NOTA: Si el Exadata esta productivo no debe correr los siguientes pasos:
 
 
 Referencia: https://docs.oracle.com/en/engineered-systems/exadata-database-machine/dbmin/adding-cluster-existing-system.html#DBMIN-GUID-EE18683C-7311-4A13-8BD9-6F0141E4A0F6
+
+NOTA: Se deben descargar los paquetes segun la versión de BD que se quiere instalar y de OS que se utilizará para el VM cluster.
+Si existe un oeda antiguo en el servidor las imagenes se pueden encontrar en el directorio WorkDir.
