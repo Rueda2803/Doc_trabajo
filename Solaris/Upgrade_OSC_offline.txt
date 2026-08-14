@@ -1,0 +1,70 @@
+-------------------------------------------------------------------------------
+                Upgrade de Oracle Solaris Cluster (rolling mode)
+-------------------------------------------------------------------------------
+
+Metodo online con actualizacion solo de OSC :
+
+Siga estas instrucciones para evitar que el sistema operativo Solaris se actualice al actualizar el software del clúster Solaris con el comando `scinstall`:
+
+*Fase pre upgrade*
+1. Validacion de espacio en zpool rpool 
+# zpool list | grep rpool
+
+2. eliminación de snapshots que no se esten utilizando si rpool > 80%
+zfs destroy <snapshot>
+
+3. Limpieza de servicios en mantenimiento
+# svcs -xv
+# svcadm disable svc:/system/auto-update:ehc
+# svcadm disable svc:/system/auto-update:stackdb
+
+4. Migrar recursos hacia el nodo 2 (si es necesario)
+# clnode evacuate nodo_a_evacuar
+
+5. Evacúe cualquier grupo de recursos que se esté ejecutando en un nodo de clúster de zona que se encuentre en el nodo que se va a actualizar.
+
+# clresourcegroup evacuate -n zone-cluster-node -Z zone-cluster-name +
+
+6.Verifique que la migración se haya completado correctamente.
+
+# cldg status;clrg status -Z all;clrs status -Z all
+
+*Fase de upgrade* 
+1. Montar ISO
+# mkdir -p /mnt/osc_sru
+# mount -f hsfs /var/tmp/osc.iso /mnt/osc_sru
+
+2. Configurar publishers
+# pkg unset-publisher ha-cluster
+# pkg set-publisher -g file:///mnt/osc_sru/repo ha-cluster
+# pkg set-publisher -e ha-cluster
+
+3. Validar paquetes
+# pkg list -af ha-cluster-incorporation
+pkg install -nv --accept ha-cluster-incorporation
+
+4. Congelar el sistema operativo
+# pkg freeze entire
+
+3. Proceda con la actualización del clúster Solaris. (iniciando con el nodo sin recursos)
+# scinstall -u update [-b bename] [-L accept,licenses]
+
+ej: scinstall -u update -b BE_Cluster_SRU -L accept
+
+4. Validar Boot Enviroment (BE)
+# beadm list
+
+5. Reinicio de nodo
+# init 6 
+
+6. Validacion de BE activo y version actualizada
+# beadm list
+# pkg list -af ha-cluster-incorporation
+
+7. Validacion de cluster 
+# scstat -g
+# cluster show
+
+8. Descongele toda la integración una vez que la actualización se haya realizado correctamente:
+
+# pkg unfreeze entire

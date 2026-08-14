@@ -1,0 +1,58 @@
+-------------------------------------------------------------------------------
+                        Upgrade de Oracle Solaris Cluster 
+-------------------------------------------------------------------------------
+
+Metodo online con actualizacion tanto de OSC como Sistema operativo:
+
+# uname -a
+SunOS cl1n1 5.11 11.4.91.214.1
+
+# pkg publisher
+PUBLISHER                   TYPE     STATUS P LOCATION
+solaris                     origin   online F https://pkg.oracle.com/ha-cluster/support/
+solaris                     origin   online F https://pkg.oracle.com/solaris/support/
+ha-cluster                  origin   online F https://pkg.oracle.com/ha-cluster/support/
+
+This was achieved using the following:
+
+pkg set-publisher \
+-k /var/pkg/ssl/pkg.oracle.com.key.pem \
+-c /var/pkg/ssl/pkg.oracle.com.certificate.pem \
+-G "*" -g https://pkg.oracle.com/ha-cluster/support ha-cluster
+
+pkg set-publisher \
+-k /var/pkg/ssl/pkg.oracle.com.key.pem \
+-c /var/pkg/ssl/pkg.oracle.com.certificate.pem \
+-G "*" -g https://pkg.oracle.com/solaris/support solaris
+
+pkg set-publisher \
+-k /var/pkg/ssl/pkg.oracle.com.key.pem \
+-c /var/pkg/ssl/pkg.oracle.com.certificate.pem \
+-p https://pkg.oracle.com/ha-cluster/support solaris
+
+Next, I upgrade just the OSC packages:
+
+scinstall -u update -b osc4.20 \
+pkg:/ha-cluster/group-package/ha-cluster-incorporation@4.4-20.2.0 \
+pkg:/consolidation/cacao/cacao-incorporation@11.4-0.175.4.0.0.15.0
+
+I then reboot the node and upgrade the other cluster nodes.
+
+When finished, I confirmed the upgrade and proceed to upgrade Solaris:
+
+# svcs -av|egrep 'contain|cacao'
+online         -             2026-07-16T17:25:28       239 svc:/application/management/common-agent-container-1:default
+online         -             2026-07-16T17:25:52         - svc:/system/cluster/cacao-install:default
+online         -             2026-07-16T17:25:52         - svc:/system/cluster/cacao-uninstall:default
+
+# scinstall -u update -b s11.4sru93-osc4.4sru20
+
+Reboot and check:
+
+# pkg list entire
+NAME (PUBLISHER)                                  VERSION                    IFO
+entire                                            11.4-11.4.93.0.1.221.2     i--
+
+# pkg list ha-cluster-incorporation
+NAME (PUBLISHER)                                  VERSION                    IFO
+ha-cluster/group-package/ha-cluster-incorporation (ha-cluster) 4.4-20.2.0                 i--

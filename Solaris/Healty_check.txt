@@ -1,0 +1,23 @@
+-------------------------------------------------------------------------------
+                Comandos para realizar un mantenimiento lógico
+-------------------------------------------------------------------------------
+A continuación se detallla los comandos utilizado para un mantenimiento lógico a nivel de solaris:
+
+# uname -a
+# uptime
+# last reboot
+# cat /etc/release
+# psrinfo -pv
+# echo "::memstat" | mdb -k
+# top
+# df
+# prstat 1 5
+# vmstat 1 5 
+# zpool list
+# zpool status
+# /usr/sbin/explorer (con este explorer extraido se verifican los logs)
+
+Si el equipo posee ldoms se pueden ejecutar los siguients comandos:
+
+# ldm list 
+# ldm list-netstat
