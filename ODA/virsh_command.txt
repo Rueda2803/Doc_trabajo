@@ -1,0 +1,68 @@
+-------------------------------------------------------------------------------
+                        Manejo de VMs en ODA con virsh
+-------------------------------------------------------------------------------
+Referencia de virsh: https://www.redhat.com/en/blog/virsh-subcommands
+
+La consola virtual, o virsh, es una utilidad de línea de comandos flexible para administrar máquinas virtuales (VM) controladas por libvirt, un conjunto de herramientas y una API para administrar plataformas de virtualización. Es la herramienta de administración predeterminada para máquinas virtuales basadas en el kernel de Linux (KVM) y también es compatible con Xen, VMware y otras plataformas.
+
+El comando virsh permite administrar máquinas virtuales de forma interactiva o por lotes. También resulta útil para controlar máquinas virtuales desde la consola de Linux y se integra con scripts o herramientas de automatización. Mediante virsh, puede conectarse rápidamente a un servidor utilizando SSH (Secure Shell) y realizar operaciones en sus máquinas virtuales sin necesidad de una interfaz gráfica.
+
+Comandos: 
+
+# virsh list --all
+ Id   Name          State
+------------------------------
+ 3    rh8-vm01      running
+ -    crc           shut off
+ -    rh8-tower01   shut off
+
+# virsh shutdown rh8-vm01 
+Domain 'rh8-vm01' is being shutdown
+
+# virsh start rh8-vm01 
+Domain 'rh8-vm01' started
+
+# virsh dumpxml rh8-vm01                                                   
+<domain type='kvm' id='4'>                                                                    
+  <name>rh8-vm01</name>                                                                       
+  <uuid>53b92c48-fce3-4464-95bf-6f442e988c94</uuid>
+  <metadata>                                                                                  
+    <libosinfo:libosinfo xmlns:libosinfo="http://libosinfo.org/xmlns/libvirt/domain/1.0">     
+      <libosinfo:os id="http://redhat.com/rhel/8.4"/>                                         
+    </libosinfo:libosinfo>                                                                    
+  </metadata>                                                                                 
+  <memory unit='KiB'>4194304</memory>                                                         
+  <currentMemory unit='KiB'>4194304</currentMemory>    
+  <vcpu placement='static'>2</vcpu>
+
+... TRUNCATED OUTPUT ...
+</domain>
+
+# virsh domifaddr rh8-vm01 
+ Name       MAC address          Protocol     Address
+-------------------------------------------------------------------------------
+ vnet6      52:54:00:c8:17:6e    ipv4         192.168.122.19/24
+ vnet7      52:54:00:04:4d:ac    ipv4         192.168.64.210/24
+
+# virsh edit rh8-vm01
+<domain type='kvm'>
+  <name>rh8-vm01</name>
+  <uuid>53b92c48-fce3-4464-95bf-6f442e988c94</uuid>
+  <metadata>
+
+... TRUNCATED OUTPUT ...
+</domain>
+
+# virsh net-edit --network hostonly
+<network>
+  <name>hostonly</name>
+  <uuid>eddd03ff-5825-42ef-bc99-968bddf773c2</uuid>
+  <bridge name='virbr1' stp='on' delay='0'/>
+  <mac address='52:54:00:67:75:b1'/>
+  <domain name='hostonly'/>
+  <ip address='192.168.64.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='192.168.64.128' end='192.168.64.254'/>
+    </dhcp>
+  </ip>
+</network>

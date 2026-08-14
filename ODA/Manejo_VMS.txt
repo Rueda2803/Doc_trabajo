@@ -1,0 +1,64 @@
+-------------------------------------------------------------------------------
+                        Manejo de VMs en ODA KVM
+-------------------------------------------------------------------------------
+
+Se recomienda revisar el siguiente link a detalle para ver los comandos de manejo de VMS: https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-7123ADEA-7134-42E8-95CC-E2F444DBAC27
+
+Comprenda los pasos para configurar la implementación de KVM para aplicaciones.
+
+• Crear almacenamiento de máquina virtual.
+• Crear una red virtual.
+• Crear discos virtuales.
+• Crear máquinas virtuales.
+
+Los siguientes enlaces proporcionan información sobre cómo realizar estos pasos:
+
+Creating a VM Storage in a KVM Deployment https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-C1769BB8-E21C-4B7E-990F-E0C369058DB3
+Creating a Virtual Network in a KVM Deployment https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-35D0B3A7-24C7-4920-B45E-4204C6A3EFD5
+Creating a Virtual Disk in a KVM Deployment https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-DF12476D-29FD-41D3-8E56-21A21BA39E1B
+Creating a Virtual Machine with ODACLI or BUI in a KVM Deployment https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-ED399BFE-15AE-41CD-AA26-5E8D590BDEA7
+
+A continuación se colocan los link para ver el manejo de los diferentes componentes configurados anteriormente:
+
+-----------------------------------------------------------------------------------
+Administración del almacenamiento de máquinas virtuales en una implementación KVM
+-----------------------------------------------------------------------------------
+Utilice ODACLI para crear, ver, modificar y eliminar el almacenamiento de máquinas virtuales en una implementación KVM de Oracle Database Appliance.
+
+• Visualización del almacenamiento de máquinas virtuales en una implementación KVM https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-8B4AD368-92AA-40AD-88EE-A83A1F843437
+• Modificación del almacenamiento de máquinas virtuales en una implementación KVM https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-1D60D644-6404-48BF-A271-A7BA2432B1AB
+• Eliminación de almacenamiento de máquinas virtuales en una implementación KVM https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-8E35A8AF-0B0A-4165-A864-CC5E7248C549
+
+----------------------------------------------------------------------------------
+Administración de redes virtuales en una implementación KVM
+----------------------------------------------------------------------------------
+Utilice ODACLI para crear, visualizar, iniciar, detener y eliminar redes virtuales en una implementación KVM de Oracle Database Appliance.
+
+• Visualización de redes virtuales en una implementación KVM https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-6D590D22-96BB-4240-853D-D477151A6EB5
+• Inicio y detención de redes virtuales en una implementación KVM https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-A3241906-0097-4FFB-A24B-34A798141B2D
+• Modificación de una red virtual en una implementación KVM https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-586EEC0A-CA74-4119-B169-20BCC4898D1A
+• Eliminación de una red virtual en una implementación KVM https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-A619847B-BB55-4ED5-BCA4-9D13636A8A2E
+
+
+----------------------------------------------------------------------------------
+Administración de discos virtuales en una implementación KVM
+----------------------------------------------------------------------------------
+Utilice ODACLI para crear, ver, clonar, modificar y eliminar discos virtuales en una implementación KVM de Oracle Database Appliance.
+
+
+• Visualización de discos virtuales en una implementación KVM https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-0DA2E024-4FCC-4B8F-BC7F-478D2955CFEA
+• Clonación de un disco virtual en una implementación KVM https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-7B4E45CF-A379-4A5A-8A36-815C3FD99CA1
+• Modificación de un disco virtual en una implementación KVM https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-69D00FED-E594-41DB-B50B-94B5EF4FA931
+• Eliminación de un disco virtual en una implementación KVM https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-DC45452F-A601-4E39-9E7D-6EED4B3872FC
+
+----------------------------------------------------------------------------------
+Administración de máquinas virtuales en una implementación KVM
+----------------------------------------------------------------------------------
+Utilice ODACLI para crear, visualizar, clonar, modificar, iniciar, detener y eliminar máquinas virtuales en una implementación KVM de Oracle Database Appliance.
+
+Clonación de una máquina virtual en una implementación KVM https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-EBDB3C0D-0A4E-4172-B4D7-19CB9E17F398
+Modificación de una máquina virtual en una implementación KVM https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-0C59B7C2-4F3D-405E-B525-A40892077B18
+Visualización de máquinas virtuales en una implementación KVM https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-83084F71-970D-4582-B73E-E2DDAB47AEF5
+Iniciar y detener máquinas virtuales en una implementación KVM https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-D7B2970F-E3F9-4205-96B8-9F3412CCEEE7
+Eliminar una máquina virtual en una implementación KVM https://docs.oracle.com/en/engineered-systems/oracle-database-appliance/19.32/odale/managing-oracle-database-appliance-kvm-deployment1.html#GUID-5FD45B1A-BB86-466F-B1B7-BCE9E7F35BE5
+
