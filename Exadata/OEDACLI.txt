@@ -1,0 +1,37 @@
+-------------------------------------------------------------------------------
+                 Que es el OEDACLI y como se utiliza
+-------------------------------------------------------------------------------
+Referencia: https://docs.oracle.com/en/engineered-systems/exadata-database-machine/dbmin/oeda-command-line-interface1.html
+
+Puede utilizar la interfaz de línea de comandos de OEDA (OEDACLI) para realizar tareas de gestión del ciclo de vida de Exadata.
+
+Entre las tareas admitidas se incluyen:
+
+> Agregar nodos a un clúster de máquinas virtuales (VM) y eliminarlos de este
+> Agregar o eliminar directorios «home» de Oracle Database
+> Agregar o eliminar celdas de almacenamiento
+> Cambiar el tamaño de los grupos de discos de Oracle ASM
+> Agregar o eliminar bases de datos adicionales
+
+OEDACLI admite tareas de gestión del ciclo de vida únicamente para sistemas Oracle Exadata. OEDACLI no admite operaciones de gestión del ciclo de vida en Oracle SuperCluster ni en Oracle Zero Data Loss Recovery Appliance (ZDLRA).
+
+OEDACLI permite actualizar un archivo de configuración de Exadata existente (es.xml). Estas actualizaciones se denominan "Acciones". Una Acción es una tarea atómica única.
+
+Una Acción puede constar de varios subcomandos; sin embargo, la mayoría de las acciones son comandos únicos. Ejemplos de pasos compuestos por varios comandos son CLONE GUEST y CLONE CELL.
+
+OEDACLI cuenta con dos modos de funcionamiento:
+
+> Modo de edición (Edit mode):
+    > Se utiliza con un archivo es.xml antes de ejecutar los pasos del comando install.sh.
+    > Sirve para editar un archivo XML (por ejemplo, para añadir un segundo Oracle Database Home) y luego guardar dicho archivo.
+    > Puede utilizarse como editor XML lógico para el modelo "es" antes de la implementación.
+
+> Modo de implementación (Deploy mode):
+
+    > Se utiliza con un archivo es.xml después de haber ejecutado los pasos del comando install.sh.
+    > Permite clonar máquinas virtuales (Guest) de Oracle VM, así como ampliar o reducir grupos de discos de Oracle ASM.
+    > Ofrece una lista de cambios admitidos más limitada que el modo de edición.
+    > Puede utilizarse como editor XML lógico y herramienta de implementación tras la implementación inicial.
+
+Para descargar el OEDACLI se puede dirigir a la siguiente pagina: https://www.oracle.com/database/technologies/oeda-downloads.html 
+

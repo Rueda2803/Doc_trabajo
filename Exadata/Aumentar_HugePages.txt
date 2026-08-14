@@ -1,0 +1,26 @@
+-------------------------------------------------------------------------------
+                Aumentar HugePages en VM Cluster 
+-------------------------------------------------------------------------------
+Referencia: Oracle Linux: HugePages What It Is... and What It Is Not... KB141360
+
+1. Verificar el uso de RAM, si el equipo se encuentra utilizando memoria SWAP proceda con el paso no. 2.
+2. Descargue el script de la nota KB151310 o vea en la carpeta scripts
+3. Tome evidencia del siguiente comando: grep Huge /proc/meminfo y de free -h
+4. Ejecute el script descargado en el paso no. 2:
+    4.1 Cree el archivo hugepages_settings.sh
+    4.2 Copie el script del paso no. 2
+    4.3 Ejecute: chmod +x hugepages_settings.sh
+    4.4 Ejecute: ./hugepages_settings.sh
+5. Este script puede dar una salida similar a la siguiente: Recommended setting: vm.nr_hugepages = 67
+6. El valor recomendado se debe colocar en el archivo: /etc/sysctl.conf con la entrada vm.nr_hugepages=<value>
+Ej:
+
+vm.nr_hugepages=67
+7. Se deben bajar las BD que se esten ejecutando (con ayuda del equipo de DB)
+8. Se reinicia el equipo para que sea persistente 
+9. Se comprueba que la configuracion sigue persistente:  # grep Huge /proc/meminfo
+10. Inicie las BD 
+11. Verifique el uso de memoria
+
+NOTA: No olvide de documentar todo de manera profesional.
+

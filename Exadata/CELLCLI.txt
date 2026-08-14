@@ -1,0 +1,103 @@
+-------------------------------------------------------------------------------
+                Utillidad CELLCLI en CELL STORAGES 
+-------------------------------------------------------------------------------
+
+Referencia: https://docs.oracle.com/en/engineered-systems/exadata-database-machine/sagug/starting-cellcli.html
+
+> La utilidad Cell Control Command-Line Interface (CellCLI) es la herramienta de administración por línea de comandos para Oracle Exadata System Software.
+
+> CellCLI se ejecuta en cada celda para permitirle administrar una celda individual. Se utiliza CellCLI para iniciar y detener la celda, gestionar la información de configuración de la celda, habilitar o deshabilitar celdas y administrar objetos en el entorno de la celda.
+
+> Esta utilidad de línea de comandos ya viene instalada cuando se suministra Oracle Exadata Storage Server.
+
+
+Puede iniciar CellCLI desde la línea de comandos del sistema operativo en la celda que desea gestionar, o bien de forma remota desde un cliente conectado a la red utilizando Secure Shell (SSH).
+
+Syntax:
+cellcli [-n] [-m] [-x] [ --xml | --json ] [ -e command ]
+
+Options: 
+-n — Ejecuta la utilidad CellCLI en modo no interactivo. Esta opción suprime el símbolo del sistema y deshabilita las funciones de edición de línea de comandos.
+
+-m — Ejecuta CellCLI en modo de supervisión (solo lectura).
+
+-x — Suprime el banner.
+
+--xml — Hace que la salida del comando se muestre en formato XML.
+
+--json — Hace que la salida del comando se muestre en formato JSON.
+
+-e command — Ejecuta el comando CellCLI especificado. Por ejemplo:
+$ cellcli -e list cell detail
+$ cellcli -e "list celldisk attributes name where name   -
+  like '.*cell01'"
+
+O unicamente ejecute cellcli para modo interactivo 
+
+Comandos de referencia que se pueden utilizar en CELLCLI: https://docs.oracle.com/en/engineered-systems/exadata-database-machine/sagug/cellcli-command-reference.html
+
+Los siguientes comandos están disponibles con la utilidad CellCLI:
+
+• ALTER
+• ASSIGN KEY
+• CALIBRATE
+• CREATE
+• DESCRIBE
+• DROP
+• EXIT
+• EXPORT CELLDISK
+• GRANT
+• HELP
+• IMPORT CELLDISK
+• LIST
+• QUIT
+• REVOKE
+• SET
+• SPOOL
+• START y @
+
+Ejemplo: 
+
+CellCLI> LIST GRIDDISK WHERE cellDisk = 'CD_01_cell05' -
+         ATTRIBUTES name, status
+
+         DATA_CD_01_cell05        active
+         RECO_CD_01_cell05        active
+
+CellCLI> LIST GRIDDISK DATA_CD_01_cell05 DETAIL
+
+         name:                   DATA_CD_01_cell05
+         status:                 active
+         comment:                
+         id:                     00000117-84d9-0096-0000-000000000000
+         creationTime:           2009-01-16T17:04:49-06:00
+         cellDisk:               CD_01_cell05
+         offset:                 0
+         availableTo:            CLUSTER-C1
+         size:                   10G
+         errorCount:             0
+         diskType:               HardDisk
+         cachedBy:               FD_01_FLASH, FD02_FLASH, FD03_FLASH
+         cachingPolicy:          default
+
+CellCLI> LIST GRIDDISK DATA_CD_01_cell05 ATTRIBUTES size
+
+         136.640625G
+
+CellCLI> LIST GRIDDISK WHERE status!=active ATTRIBUTES name
+
+         data_CD_01_1_abcd2x3
+
+CellCLI> LIST GRIDDISK data4_CD_09_cell01 DETAIL
+
+         name:                   data4_CD_09_cell01
+         availableTo:            
+         cellDisk:               CD_09_cell01
+         comment:                
+         creationTime:           2009-07-26T17:09:46-07:00
+         diskType:               HardDisk
+         errorCount:             0
+         id:                     00000122-b98a-a47a-0000-000000000000
+         offset:                 27.546875G
+         size:                   75G
+         status:                 active

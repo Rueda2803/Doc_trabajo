@@ -10,8 +10,9 @@ Referencia: https://docs.oracle.com/en/engineered-systems/exadata-database-machi
 
 NOTA: el usuario root debe tener la misma contraseña en toda la infraestructura del Exadata por ejemplo welcome1
 
+3. Cargue el archivo generado con el comando LOAD FILE name = es.xml (este puede variar)
 
-3. 
+4. 
 oedacli> add diskgroup diskgroupname=OTHER7 diskgroupsize=1TB  redundancy=HIGH celllist='dbm01celadm07.example.com,dbm01celadm08.example.com,dbm01celadm09.example.com'  where clustername=Cluster-c1
 oedacli> save action
 oedacli> merge actions
