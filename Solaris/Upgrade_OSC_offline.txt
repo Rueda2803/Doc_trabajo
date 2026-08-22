@@ -18,6 +18,10 @@ zfs destroy <snapshot>
 # svcadm disable svc:/system/auto-update:ehc
 # svcadm disable svc:/system/auto-update:stackdb
 
+NOTA: Antes de pasar al paso cuatro verifique estado de salud del cluster por medio del comando: #cluster status si algun recurso presenta algun fail haga lo siguiente:
+1. Pregunte si el recurso esta bien 
+2. Ejecute el comando: #/usr/cluster/bin/scha_resource_setstatus -R resource_name -G resource_group_name -s OK
+
 4. Migrar recursos hacia el nodo 2 (si es necesario)
 # clnode evacuate nodo_a_evacuar
 
@@ -32,16 +36,24 @@ zfs destroy <snapshot>
 *Fase de upgrade* 
 1. Montar ISO
 # mkdir -p /mnt/osc_sru
+# mkdir -p /mnt/osc_full
 # mount -f hsfs /var/tmp/osc.iso /mnt/osc_sru
+# mount -f hsfs /var/tmp/osc_full.iso /mnt/osc_full
 
 2. Configurar publishers
 # pkg unset-publisher ha-cluster
+# pkg unset-publisher solaris
+# pkg set-publisher -p file:///mnt/osc_full/repo 
 # pkg set-publisher -g file:///mnt/osc_sru/repo ha-cluster
+# pkg set-publisher -g file:///mnt/osc_sru/repo solaris
 # pkg set-publisher -e ha-cluster
+# pkg set-publisher -e solaris
 
 3. Validar paquetes
+# pkg list -af -g file:///mnt/osc44/REPO/consolidation/cacao/cacao-incorporation
 # pkg list -af ha-cluster-incorporation
-pkg install -nv --accept ha-cluster-incorporation
+# pkg list -af consolidation/cacao/cacao-incorporation
+# pkg update -nv
 
 4. Congelar el sistema operativo
 # pkg freeze entire
@@ -60,10 +72,10 @@ ej: scinstall -u update -b BE_Cluster_SRU -L accept
 6. Validacion de BE activo y version actualizada
 # beadm list
 # pkg list -af ha-cluster-incorporation
+# pkg list -af cacao
 
 7. Validacion de cluster 
-# scstat -g
-# cluster show
+# cluster status
 
 8. Descongele toda la integración una vez que la actualización se haya realizado correctamente:
 
