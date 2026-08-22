@@ -36,14 +36,11 @@ NOTA: Antes de pasar al paso cuatro verifique estado de salud del cluster por me
 *Fase de upgrade* 
 1. Montar ISO
 # mkdir -p /mnt/osc_sru
-# mkdir -p /mnt/osc_full
 # mount -f hsfs /var/tmp/osc.iso /mnt/osc_sru
-# mount -f hsfs /var/tmp/osc_full.iso /mnt/osc_full
 
 2. Configurar publishers
 # pkg unset-publisher ha-cluster
 # pkg unset-publisher solaris
-# pkg set-publisher -p file:///mnt/osc_full/repo 
 # pkg set-publisher -g file:///mnt/osc_sru/repo ha-cluster
 # pkg set-publisher -g file:///mnt/osc_sru/repo solaris
 # pkg set-publisher -e ha-cluster
