@@ -35,19 +35,18 @@ NOTA: Antes de pasar al paso cuatro verifique estado de salud del cluster por me
 
 *Fase de upgrade* 
 1. Montar ISO
-# mkdir -p /mnt/osc_sru
-# mount -f hsfs /var/tmp/osc.iso /mnt/osc_sru
+# mkdir -p /mnt/sru20_osc
+# mount -f hsfs /var/tmp/osc-4_4_20_2_0-repo-incr /mnt/sru20_osc
 
 2. Configurar publishers
 # pkg unset-publisher ha-cluster
 # pkg unset-publisher solaris
-# pkg set-publisher -g file:///mnt/osc_sru/repo ha-cluster
-# pkg set-publisher -g file:///mnt/osc_sru/repo solaris
+# pkg set-publisher -g file:///mnt/sru20_osc/repo ha-cluster
+# pkg set-publisher -g file:///mnt/sru20_osc/repo solaris
 # pkg set-publisher -e ha-cluster
 # pkg set-publisher -e solaris
 
 3. Validar paquetes
-# pkg list -af -g file:///mnt/osc44/REPO/consolidation/cacao/cacao-incorporation
 # pkg list -af ha-cluster-incorporation
 # pkg list -af consolidation/cacao/cacao-incorporation
 # pkg update -nv
@@ -56,9 +55,7 @@ NOTA: Antes de pasar al paso cuatro verifique estado de salud del cluster por me
 # pkg freeze entire
 
 3. Proceda con la actualización del clúster Solaris. (iniciando con el nodo sin recursos)
-# scinstall -u update [-b bename] [-L accept,licenses]
-
-ej: scinstall -u update -b BE_Cluster_SRU -L accept
+# scinstall -u update -b BE_Cluster_SRU20 -L accept
 
 4. Validar Boot Enviroment (BE)
 # beadm list
@@ -75,5 +72,4 @@ ej: scinstall -u update -b BE_Cluster_SRU -L accept
 # cluster status
 
 8. Descongele toda la integración una vez que la actualización se haya realizado correctamente:
-
 # pkg unfreeze entire

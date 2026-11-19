@@ -1,0 +1,21 @@
+Configuring Oracle ILOM Using Static IP Address
+
+1. Enter the default user name, root, and the default password, changeme.
+The Oracle ILOM CLI prompt appears. Change the default password to a secure password
+of your choice.
+
+2. Set the working directory.
+cd /SP/network
+
+3. Specify a static Ethernet configuration as follows:
+set pendingipaddress=xxx.xxx.xx.xx
+set pendingipnetmask=yyy.yyy.yyy.y
+set pendingipgateway=zzz.zzz.zz.zzz
+set commitpending=true
+set state=enabled
+xxx.xxx.xx.xx, yyy.yyy.yyy.y and zzz.zzz.zz.zzz are the IP address, netmask, and
+gateway (respectively) for your ILOM and network configuration.
+
+4. Verify changes and then exit:
+show /SP/network
+exit
